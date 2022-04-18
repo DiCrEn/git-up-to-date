@@ -1,0 +1,13 @@
+.idea/*
+.nyc_output
+dist
+node_modules
+test
+src/**.js
+coverage
+*.log
+yarn.lock
+.env*
+!.env.demo
+tsconfig.tsbuildinfo
+run*.sh
