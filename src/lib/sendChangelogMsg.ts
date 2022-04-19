@@ -3,11 +3,11 @@ import { RequestOptions } from "https";
 
 import { changelogData } from "../types";
 
-const CHANNELID = process.env.CHANNELID;
-const TOKEN = process.env.TOKEN;
+const WEBHOOK = process.env.WEBHOOK || "";
 const PROJECT = process.env.PROJECT || "";
 
 export function sendChangelogToChannel(changelog: changelogData) {
+  if (!WEBHOOK) throw new Error("WEBHOOK is not defined");
   const msg = generateMsg(changelog);
   sendMessage(msg);
 }
@@ -56,15 +56,15 @@ function getEmojiSection(section: string) {
 function sendMessage(message: string) {
   const post_data = JSON.stringify({
     content: message,
+    username: "Git up to date",
   });
 
   const post_options = {
-    host: "discordapp.com",
+    host: "discord.com",
     port: 443,
-    path: `/api/channels/${CHANNELID}/messages`,
+    path: WEBHOOK.replace("https://discord.com", ""),
     method: "POST",
     headers: {
-      Authorization: `Bot ${TOKEN}`,
       "Content-Type": "application/json",
       "Content-Length": Buffer.byteLength(post_data),
     },
