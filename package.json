@@ -1,6 +1,6 @@
 {
   "name": "git-up-to-date",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Report the latest changes of your git repositories using your project's changelog.md file",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
