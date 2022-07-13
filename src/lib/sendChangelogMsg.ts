@@ -3,13 +3,22 @@ import { RequestOptions } from "https";
 
 import { changelogData } from "../types";
 
-const WEBHOOK = process.env.WEBHOOK || "";
-const PROJECT = process.env.PROJECT || "";
+const WEBHOOK =
+  process.env.WEBHOOK ||
+  "https://discord.com/api/webhooks/974608679846428712/bnAYrbgCkrQ4Gh-YzYoXPIh0T_HJJruBngz-BQbTa-4dR4L3Uzoo8D2-3WUHAbHhvfkz";
+const PROJECT = process.env.PROJECT || "Karonte";
 
-export function sendChangelogToChannel(changelog: changelogData) {
+export async function sendChangelogToChannel(changelog: changelogData) {
   if (!WEBHOOK) throw new Error("WEBHOOK is not defined");
   const msg = generateMsg(changelog);
-  sendMessage(msg);
+  const msgs = splitMessages(msg);
+  const index = 0;
+  console.log(msgs);
+  for (const msgSplitted of msgs) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log(`Send msg nº ${index} charcount: ${msgSplitted.length}`);
+    sendMessage(msgSplitted);
+  }
 }
 
 function generateMsg(changelog: changelogData) {
@@ -51,6 +60,22 @@ function getEmojiSection(section: string) {
     default:
       return ":rainbow:";
   }
+}
+
+function splitMessages(msg: string) {
+  const linebreaks = msg.split("\n");
+  const allmsgs = [];
+  let buildedmsg = "";
+  for (const line of linebreaks) {
+    if (buildedmsg.length + line.length > 2000) {
+      allmsgs.push(buildedmsg);
+      buildedmsg = line;
+    } else {
+      buildedmsg += "\n" + line;
+    }
+  }
+  allmsgs.push(buildedmsg);
+  return allmsgs;
 }
 
 function sendMessage(message: string) {
