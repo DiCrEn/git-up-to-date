@@ -3,10 +3,8 @@ import { RequestOptions } from "https";
 
 import { changelogData } from "../types";
 
-const WEBHOOK =
-  process.env.WEBHOOK ||
-  "https://discord.com/api/webhooks/974608679846428712/bnAYrbgCkrQ4Gh-YzYoXPIh0T_HJJruBngz-BQbTa-4dR4L3Uzoo8D2-3WUHAbHhvfkz";
-const PROJECT = process.env.PROJECT || "Karonte";
+const WEBHOOK = process.env.WEBHOOK || "";
+const PROJECT = process.env.PROJECT || "";
 
 export async function sendChangelogToChannel(changelog: changelogData) {
   if (!WEBHOOK) throw new Error("WEBHOOK is not defined");
