@@ -6,7 +6,7 @@ import { changelogData } from "../types";
 const WEBHOOK = process.env.WEBHOOK || "";
 const PROJECT = process.env.PROJECT || "";
 
-export async function sendChangelogToChannel(changelog: changelogData) {
+export async function sendChangelogToChannel(changelog: changelogData, receiver: string) {
   if (!WEBHOOK) throw new Error("WEBHOOK is not defined");
   const msg = generateMsg(changelog);
   const msgs = splitMessages(msg);
@@ -15,21 +15,21 @@ export async function sendChangelogToChannel(changelog: changelogData) {
   for (const msgSplitted of msgs) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     console.log(`Send msg nº ${index} charcount: ${msgSplitted.length}`);
-    sendMessage(msgSplitted);
+    sendMessage(msgSplitted, receiver);
   }
 }
 
 function generateMsg(changelog: changelogData) {
   const lines = [
     "‎",
-    `:confetti_ball: :confetti_ball: ${PROJECT} version **${changelog.versionNumber}** was released! :confetti_ball: :confetti_ball:`,
+    `:confetti_ball: :confetti_ball: ${PROJECT} version *${changelog.versionNumber}* was released! :confetti_ball: :confetti_ball:`,
   ];
 
   for (const section in changelog.sections) {
     const sectionData = changelog.sections[section];
     lines.push(
       "",
-      `**${getEmojiSection(section)} ${section} ${getEmojiSection(section)}**`
+      `${getEmojiSection(section)} *${section}* ${getEmojiSection(section)}`
     );
     for (const change of sectionData) {
       if (change.title) {
@@ -76,22 +76,40 @@ function splitMessages(msg: string) {
   return allmsgs;
 }
 
-function sendMessage(message: string) {
-  const post_data = JSON.stringify({
-    content: message,
-    username: "Git up to date",
-  });
+function sendMessage(message: string, receiver: string) {
+  let post_data: string = ''
+  let post_options: https.RequestOptions = {} as RequestOptions;
 
-  const post_options = {
-    host: "discord.com",
-    port: 443,
-    path: WEBHOOK.replace("https://discord.com", ""),
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(post_data),
-    },
-  } as RequestOptions;
+  if (receiver == 'DISCORD') {
+    post_data = JSON.stringify({
+      content: message,
+      username: "Git up to date",
+    });
+    post_options = {
+      host: "discord.com",
+      port: 443,
+      path: WEBHOOK.replace("https://discord.com", ""),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(post_data),
+      },
+    } as RequestOptions;
+  } else if (receiver == 'SLACK') {
+    post_data = JSON.stringify({
+      "text": message
+    })
+    post_options = {
+      host: "hooks.slack.com",
+      port: 443,
+      path: WEBHOOK.replace("https://hooks.slack.com", ""),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(post_data),
+      },
+    } as RequestOptions;
+  }
 
   // Set up the request
   const post_req = https.request(post_options, function (res) {
