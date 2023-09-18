@@ -16,7 +16,10 @@
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:lint": "eslint src --ext .ts --fix",
     "watch:build": "tsc -p tsconfig.json -w",
-    "version": "standard-version"
+    "version:pre": "standard-version -p",
+    "version:patch": "standard-version -r patch",
+    "version:minor": "standard-version -r minor",
+    "version:major": "standard-version -r major"
   },
   "engines": {
     "node": ">=14"
